@@ -1,0 +1,301 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+:root {
+    --primary: #2563eb;
+    --success: #22c55e;
+    --danger: #ef4444;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --text: #1f2937;
+    --border: #d1d5db;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 80px;
+}
+
+header {
+    background: var(--primary);
+    color: white;
+    text-align: center;
+    padding: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+header h1 {
+    font-size: 1.4rem;
+}
+
+/* Tabs */
+
+.tab {
+    display: none;
+    padding: 16px;
+}
+
+.tab.active {
+    display: block;
+}
+
+/* Cards */
+
+.card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+.card h2 {
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+}
+
+/* Inputs */
+
+input,
+select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+button {
+    width: 100%;
+    border: none;
+    border-radius: 10px;
+    background: var(--primary);
+    color: white;
+    padding: 12px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+button:hover {
+    opacity: .9;
+}
+
+/* Bottom Navigation */
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: white;
+    display: flex;
+    border-top: 1px solid var(--border);
+    z-index: 1000;
+}
+
+.tab-btn {
+    flex: 1;
+    border-radius: 0;
+    background: white;
+    color: #555;
+    padding: 16px;
+}
+
+.tab-btn.active {
+    background: var(--primary);
+    color: white;
+}
+
+/* Clock */
+
+.clock-container {
+    width: 100%;
+    max-width: 340px;
+    margin: 0 auto 20px auto;
+}
+
+#medClock {
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 4px 15px rgba(0,0,0,.1);
+}
+
+/* Schedule Cards */
+
+.schedule-card {
+    background: white;
+    border-radius: 14px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+.schedule-header {
+    padding: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.schedule-body {
+    padding: 14px;
+    border-top: 1px solid #eee;
+    display: none;
+}
+
+.schedule-body.open {
+    display: block;
+}
+
+.schedule-completed {
+    border-left: 6px solid var(--success);
+}
+
+.schedule-current {
+    border-left: 6px solid var(--primary);
+}
+
+.schedule-upcoming {
+    border-left: 6px solid #cbd5e1;
+}
+
+/* Medicine Items */
+
+.med-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.med-item:last-child {
+    border-bottom: none;
+}
+
+.med-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.med-name {
+    font-weight: 600;
+}
+
+.med-dose {
+    color: #666;
+    font-size: .9rem;
+}
+
+.med-check {
+    width: 22px;
+    height: 22px;
+}
+
+/* Setup Lists */
+
+.list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-top: 8px;
+    background: #f8fafc;
+    border-radius: 10px;
+}
+
+.delete-btn {
+    background: var(--danger);
+    width: auto;
+    padding: 8px 12px;
+}
+
+/* Medicine Selection */
+
+.medicine-option {
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 8px;
+}
+
+.medicine-option label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.medicine-option input[type="checkbox"] {
+    width: auto;
+    margin-right: 8px;
+}
+
+.dose-edit {
+    margin-top: 6px;
+}
+
+/* History */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .9rem;
+}
+
+th {
+    background: var(--primary);
+    color: white;
+}
+
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+tbody tr:nth-child(even) {
+    background: #f9fafb;
+}
+
+/* Status Colors */
+
+.status-done {
+    color: var(--success);
+    font-weight: bold;
+}
+
+.status-missed {
+    color: var(--danger);
+    font-weight: bold;
+}
+
+/* Responsive */
+
+@media (max-width: 480px) {
+
+    body {
+        font-size: 14px;
+    }
+
+    table {
+        font-size: .8rem;
+    }
+
+    th,
+    td {
+        padding: 6px;
+    }
+}

@@ -1,0 +1,33 @@
+{
+    "medicines": [
+      {
+        "id": 1,
+        "name": "Med1",
+        "defaultDose": "1.2 ml"
+      }
+    ],
+  
+    "schedules": [
+      {
+        "id": 1,
+        "time": "15:00",
+        "medications": [
+          {
+            "medicineId": 1,
+            "dose": "1.2 ml"
+          }
+        ]
+      }
+    ],
+  
+    "dailyLog": {
+      "2026-06-26": {
+        "1": {
+          "completed": true,
+          "completedAt": "15:01"
+        }
+      }
+    },
+  
+    "history": []
+  }

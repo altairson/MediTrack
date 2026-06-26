@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>MediTrack</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>MediTrack</h1>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bottom-nav">
+        <button class="tab-btn active" data-tab="mainTab">
+            Home
+        </button>
+
+        <button class="tab-btn" data-tab="setupTab">
+            Setup
+        </button>
+
+        <button class="tab-btn" data-tab="historyTab">
+            History
+        </button>
+    </nav>
+
+    <!-- MAIN TAB -->
+    <section id="mainTab" class="tab active">
+
+        <div class="clock-container">
+            <canvas id="medClock"></canvas>
+        </div>
+
+        <div class="section-header">
+            <h2>Today's Schedule</h2>
+        </div>
+
+        <div id="todaySchedule"></div>
+
+    </section>
+
+    <!-- SETUP TAB -->
+    <section id="setupTab" class="tab">
+
+        <div class="card">
+
+            <h2>Add Medicine</h2>
+
+            <input
+                type="text"
+                id="medicineName"
+                placeholder="Medicine name"
+            >
+
+            <input
+                type="text"
+                id="medicineDose"
+                placeholder="Default dose (e.g. 2ml)"
+            >
+
+            <button id="addMedicineBtn">
+                Add Medicine
+            </button>
+
+            <div id="medicineList"></div>
+
+        </div>
+
+        <div class="card">
+
+            <h2>Add Time Schedule</h2>
+
+            <input
+                type="time"
+                id="scheduleTime"
+            >
+
+            <div id="medicineCheckboxes"></div>
+
+            <button id="addScheduleBtn">
+                Add Schedule
+            </button>
+
+            <div id="scheduleList"></div>
+
+        </div>
+
+    </section>
+
+    <!-- HISTORY TAB -->
+    <section id="historyTab" class="tab">
+
+        <div class="card">
+
+            <h2>Medication History</h2>
+
+            <table id="historyTable">
+
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Medicine</th>
+                        <th>Dose</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+    <script src="app.js"></script>
+
+</body>
+</html>
