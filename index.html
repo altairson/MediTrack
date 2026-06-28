@@ -1,33 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MediTrack</title>
-
+    <!-- FontAwesome for medical icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font for professional typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <header>
-        <h1>MediTrack</h1>
+        <h1><i class="fa-solid fa-heart-pulse"></i> MediTrack</h1>
     </header>
 
     <!-- Navigation -->
     <nav class="bottom-nav">
         <button class="tab-btn active" data-tab="mainTab">
-            Home
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
         </button>
 
         <button class="tab-btn" data-tab="setupTab">
-            Setup
+            <i class="fa-solid fa-gears"></i>
+            <span>Setup</span>
         </button>
 
         <button class="tab-btn" data-tab="historyTab">
-            History
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <span>History</span>
         </button>
     </nav>
 
@@ -38,8 +46,14 @@
             <canvas id="medClock"></canvas>
         </div>
 
+        <!-- Emergency Button -->
+        <button id="emergencyBtn" onclick="openEmergencyModal()" style="display: none;">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>EMERGENCY</span>
+        </button>
+
         <div class="section-header">
-            <h2>Today's Schedule</h2>
+            <h2><i class="fa-solid fa-calendar-day"></i> Today's Schedule</h2>
         </div>
 
         <div id="todaySchedule"></div>
@@ -49,47 +63,130 @@
     <!-- SETUP TAB -->
     <section id="setupTab" class="tab">
 
-        <div class="card">
-
-            <h2>Add Medicine</h2>
-
-            <input
-                type="text"
-                id="medicineName"
-                placeholder="Medicine name"
-            >
-
-            <input
-                type="text"
-                id="medicineDose"
-                placeholder="Default dose (e.g. 2ml)"
-            >
-
-            <button id="addMedicineBtn">
-                Add Medicine
+        <div class="setup-tabs">
+            <button class="setup-tab-btn active" id="btn-setup-medicines" onclick="switchSetupSubTab('medicines')">
+                <i class="fa-solid fa-pills"></i> Medicines
             </button>
-
-            <div id="medicineList"></div>
-
+            <button class="setup-tab-btn" id="btn-setup-schedules" onclick="switchSetupSubTab('schedules')">
+                <i class="fa-solid fa-clock"></i> Schedules
+            </button>
+            <button class="setup-tab-btn" id="btn-setup-emergency" onclick="switchSetupSubTab('emergency')"
+                style="color: #dc2626;">
+                <i class="fa-solid fa-triangle-exclamation"></i> Emergency
+            </button>
         </div>
 
-        <div class="card">
+        <!-- MEDICINES SECTION -->
+        <div id="setupMedicinesTab" class="setup-sub-tab-content">
+            <div class="card">
+                <div class="card-header-with-action">
+                    <h2><i class="fa-solid fa-prescription-bottle-medical"></i> Add Medicine</h2>
+                    <div style="display: flex; gap: 6px;">
+                        <button onclick="exportMedicines()"
+                            style="background: #0ea5e9; width: auto; padding: 6px 10px; font-size: 0.78rem; border-radius: 8px;">
+                            <i class="fa-solid fa-file-csv"></i> Export
+                        </button>
+                        <button class="toggle-form-btn" id="btn-toggle-med-form"
+                            onclick="toggleAddForm('addMedicineForm', 'btn-toggle-med-form')"><i
+                                class="fa-solid fa-plus"></i> Add</button>
+                    </div>
+                </div>
 
-            <h2>Add Time Schedule</h2>
+                <div id="addMedicineForm" class="collapsible-form">
+                    <input type="text" id="medicineName" placeholder="Medicine name (e.g. Mogadon)">
 
-            <input
-                type="time"
-                id="scheduleTime"
-            >
+                    <input type="text" id="medicineIngredient"
+                        placeholder="Target ingredient (e.g. Nitrazepam) (Optional)">
 
-            <div id="medicineCheckboxes"></div>
+                    <div style="display: flex; gap: 10px; margin-bottom: 0;">
+                        <input type="number" id="medicineConcentration" placeholder="Conc. (mg/ml) (Optional)"
+                            step="any" style="flex: 1;">
+                        <input type="number" id="medicineTargetMg" placeholder="Target mg (Optional)" step="any"
+                            style="flex: 1;">
+                    </div>
 
-            <button id="addScheduleBtn">
-                Add Schedule
-            </button>
+                    <input type="text" id="medicineDose"
+                        placeholder="Default dose (e.g. 2ml) (Calculated if inputs above are filled)">
 
-            <div id="scheduleList"></div>
+                    <input type="text" id="medicineStock" placeholder="Total stock (e.g. 50ml or 100 tabs) (Optional)">
 
+                    <label
+                        style="display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 600; color: #dc2626; cursor: pointer; padding: 8px 0; border-top: 1px solid var(--border); margin-top: 4px;">
+                        <input type="checkbox" id="medicineIsEmergency"
+                            style="width: 18px; height: 18px; accent-color: #dc2626;">
+                        <span><i class="fa-solid fa-triangle-exclamation"></i> Emergency Medicine <span
+                                style="font-weight: 400; color: #64748b; font-size: 0.78rem;">(Can only be assigned to
+                                emergency situations)</span></span>
+                    </label>
+
+                    <button id="addMedicineBtn">
+                        <i class="fa-solid fa-circle-plus"></i> Add Medicine
+                    </button>
+                </div>
+
+                <div id="medicineList"></div>
+            </div>
+        </div>
+
+        <!-- SCHEDULES SECTION -->
+        <div id="setupSchedulesTab" class="setup-sub-tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header-with-action">
+                    <h2 id="schedule-form-title"><i class="fa-solid fa-calendar-plus"></i> Add Time Schedule</h2>
+                    <div style="display: flex; gap: 6px;">
+                        <button onclick="exportSchedules()"
+                            style="background: #0ea5e9; width: auto; padding: 6px 10px; font-size: 0.78rem; border-radius: 8px;">
+                            <i class="fa-solid fa-file-csv"></i> Export
+                        </button>
+                        <button class="toggle-form-btn" id="btn-toggle-sched-form"
+                            onclick="toggleAddForm('addScheduleForm', 'btn-toggle-sched-form')"><i
+                                class="fa-solid fa-plus"></i> Add</button>
+                    </div>
+                </div>
+
+                <div id="addScheduleForm" class="collapsible-form">
+                    <input type="time" id="scheduleTime">
+
+                    <div id="medicineCheckboxes"></div>
+
+                    <button id="addScheduleBtn">
+                        <i class="fa-solid fa-circle-check"></i> Add Schedule
+                    </button>
+                    <button id="cancelScheduleEditBtn" style="background: #64748b; margin-top: 8px; display: none;"
+                        onclick="cancelScheduleEdit()">
+                        <i class="fa-solid fa-circle-xmark"></i> Cancel Edit
+                    </button>
+                </div>
+
+                <div id="scheduleList"></div>
+            </div>
+        </div>
+
+        <!-- EMERGENCY SITUATIONS SECTION -->
+        <div id="setupEmergencyTab" class="setup-sub-tab-content" style="display: none;">
+            <div class="card" style="border-top: 3px solid #ef4444;">
+                <div class="card-header-with-action">
+                    <h2 style="color: #dc2626;"><i class="fa-solid fa-triangle-exclamation"></i> Emergency Situations
+                    </h2>
+                    <button class="toggle-form-btn" id="btn-toggle-emerg-form"
+                        onclick="toggleAddForm('addEmergencyForm', 'btn-toggle-emerg-form'); renderEmergencyMedSelector();"><i
+                            class="fa-solid fa-plus"></i> Add</button>
+                </div>
+
+                <div id="addEmergencyForm" class="collapsible-form">
+                    <input type="text" id="emergSituTitle" placeholder="Situation title (e.g. Seizure, Panic Attack)">
+                    <textarea id="emergSituDesc" placeholder="Description / instructions (Optional)" rows="3"
+                        style="width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 10px; font-family: inherit; font-size: 0.9rem; resize: vertical; box-sizing: border-box; margin-bottom: 8px;"></textarea>
+                    <div style="font-size: 0.82rem; font-weight: 600; color: #64748b; margin-bottom: 6px;"><i
+                            class="fa-solid fa-pills"></i> Select medications:</div>
+                    <div id="emergencyMedCheckboxes"></div>
+                    <button onclick="addEmergencySituation()" style="background: #dc2626; margin-top: 10px;">
+                        <i class="fa-solid fa-circle-plus"></i> Add Situation
+                    </button>
+                </div>
+
+                <div id="emergencySituationList"></div>
+            </div>
         </div>
 
     </section>
@@ -98,13 +195,69 @@
     <section id="historyTab" class="tab">
 
         <div class="card">
-            <h2>Medication History</h2>
-            <div id="historyContainer"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h2 style="margin-bottom: 0;"><i class="fa-solid fa-notes-medical"></i> Medication History</h2>
+            </div>
+
+            <div class="history-tabs">
+                <button class="history-tab-btn active" id="btn-history-log" onclick="switchHistorySubTab('log')">
+                    <i class="fa-solid fa-list-check"></i> Log
+                </button>
+                <button class="history-tab-btn" id="btn-history-analytics" onclick="switchHistorySubTab('analytics')">
+                    <i class="fa-solid fa-chart-line"></i> Analytics
+                </button>
+            </div>
+
+            <div id="historyLogTab" class="history-sub-tab-content">
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+                    <button onclick="exportHistoryLog()"
+                        style="background: #0ea5e9; width: auto; padding: 8px 14px; font-size: 0.82rem; border-radius: 8px;">
+                        <i class="fa-solid fa-file-csv"></i> Export Log CSV
+                    </button>
+                </div>
+                <div id="historyContainer"></div>
+            </div>
+
+            <div id="historyAnalyticsTab" class="history-sub-tab-content" style="display: none;">
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+                    <button onclick="exportAnalytics()"
+                        style="background: #0ea5e9; width: auto; padding: 8px 14px; font-size: 0.82rem; border-radius: 8px;">
+                        <i class="fa-solid fa-file-csv"></i> Export Analytics CSV
+                    </button>
+                </div>
+                <div id="analyticsContainer"></div>
+            </div>
         </div>
 
     </section>
 
+    <!-- EMERGENCY MODAL -->
+    <div id="emergencyModal" class="emergency-modal-overlay">
+        <div class="emergency-modal">
+            <div class="emergency-modal-header">
+                <div class="emergency-modal-title">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    EMERGENCY
+                </div>
+                <button class="emergency-close-btn" onclick="closeEmergencyModal()"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- Ambulance Call -->
+            <a href="tel:112" class="ambulance-call-btn">
+                <i class="fa-solid fa-phone"></i>
+                <div>
+                    <div style="font-size: 1.1rem; font-weight: 800;">AMBULANCE CALL</div>
+                    <div style="font-size: 0.82rem; opacity: 0.9;">Tap to call 112</div>
+                </div>
+            </a>
+
+            <div id="emergencyModalBody" class="emergency-modal-body"></div>
+        </div>
+    </div>
+
     <script src="app.js"></script>
 
 </body>
+
 </html>
