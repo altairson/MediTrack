@@ -246,40 +246,206 @@ button:hover {
     margin-top: 6px;
 }
 
-/* History */
+/* History — Card Layout */
 
-table {
-    width: 100%;
-    border-collapse: collapse;
+/* Month block wrapper */
+.history-month-block {
+    margin-bottom: 8px;
+}
+
+/* Month separator */
+.history-month-separator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0 10px;
+}
+
+.history-month-separator::before,
+.history-month-separator::after {
+    content: "";
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #d1d5db);
+}
+
+.history-month-separator::after {
+    background: linear-gradient(to left, transparent, #d1d5db);
+}
+
+.history-month-label {
+    font-size: .75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: #94a3b8;
+    white-space: nowrap;
+    padding: 4px 12px;
+    background: #f1f5f9;
+    border-radius: 20px;
+}
+
+/* Day row */
+.history-day {
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    border: 1px solid #e5e7eb;
+}
+
+.history-day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    cursor: pointer;
+    user-select: none;
+    transition: background .15s;
+}
+
+.history-day-header:hover {
+    background: #f8fafc;
+}
+
+.history-day-label {
+    font-weight: 600;
+    font-size: .95rem;
+    color: var(--text);
+}
+
+.history-day-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.history-day-badge {
+    font-size: .72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+
+.badge-all {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badge-partial {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.history-chevron {
+    font-size: .7rem;
+    color: #94a3b8;
+    transition: transform .2s;
+}
+
+/* Collapsible body — hidden by default */
+.history-day-body {
+    display: none;
+    padding: 0 14px 12px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.history-day-body.open {
+    display: block;
+}
+
+/* Time slots */
+.history-slot {
+    margin-top: 10px;
+}
+
+.history-time {
+    display: block;
+    font-size: .78rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-bottom: 4px;
+    padding-left: 2px;
+}
+
+.history-entry {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 9px;
+    margin-bottom: 4px;
     font-size: .9rem;
 }
 
-th {
-    background: var(--primary);
-    color: white;
+.entry-taken {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
 }
 
-th,
-td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
+.entry-missed {
+    background: #fff5f5;
+    border: 1px solid #fecaca;
 }
 
-tbody tr:nth-child(even) {
-    background: #f9fafb;
+.entry-icon {
+    font-size: .95rem;
+    flex-shrink: 0;
+}
+
+.entry-name {
+    font-weight: 600;
+    flex: 1;
+    color: var(--text);
+}
+
+.entry-dose {
+    color: #64748b;
+    font-size: .85rem;
+    margin-right: 4px;
+}
+
+.entry-status {
+    font-size: .72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
 }
 
 /* Status Colors */
 
 .status-done {
-    color: var(--success);
-    font-weight: bold;
+    color: #16a34a;
 }
 
 .status-missed {
     color: var(--danger);
-    font-weight: bold;
+}
+
+/* Empty State */
+
+.history-empty {
+    text-align: center;
+    padding: 32px 16px;
+    color: #94a3b8;
+}
+
+.history-empty-icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.history-empty p {
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #64748b;
+}
+
+.history-empty small {
+    font-size: .85rem;
 }
 
 /* Responsive */
@@ -290,12 +456,9 @@ tbody tr:nth-child(even) {
         font-size: 14px;
     }
 
-    table {
-        font-size: .8rem;
-    }
-
-    th,
-    td {
-        padding: 6px;
+    .history-entry {
+        font-size: .85rem;
+        padding: 8px 10px;
     }
 }
+

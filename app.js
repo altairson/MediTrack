@@ -323,6 +323,10 @@ function completeSchedule(id) {
         return;
     }
 
+    // NOTE: addHistoryEntry must be called BEFORE overwriting log[id]
+    // so that log.meds is still available to determine Taken/Missed status.
+    addHistoryEntry(id);
+
     const log = getTodayLog();
 
     log[id] = {
@@ -332,8 +336,6 @@ function completeSchedule(id) {
             minute: "2-digit"
         })
     };
-
-    addHistoryEntry(id);
 
     saveDatabase();
 
@@ -372,26 +374,192 @@ function addHistoryEntry(scheduleId) {
 
 function renderHistory() {
 
-    const tbody = document.querySelector("#historyTable tbody");
+    const container = document.getElementById("historyContainer");
 
-    tbody.innerHTML = "";
+    if (!container) return;
 
-    [...db.history].reverse().forEach(h => {
-
-        const tr = document.createElement("tr");
-
-        tr.innerHTML = `
-            <td>${h.date}</td>
-            <td>${h.time}</td>
-            <td>${h.medicine}</td>
-            <td>${h.dose}</td>
-            <td class="${h.status === "Taken" ? "status-done" : "status-missed"}">
-                ${h.status}
-            </td>
+    if (db.history.length === 0) {
+        container.innerHTML = `
+            <div class="history-empty">
+                <div class="history-empty-icon">📋</div>
+                <p>No medication history yet.</p>
+                <small>Complete a schedule to see your log here.</small>
+            </div>
         `;
+        return;
+    }
 
-        tbody.appendChild(tr);
+    // Collect and sort unique dates descending
+    const grouped = {};
+    db.history.forEach(h => {
+        if (!grouped[h.date]) grouped[h.date] = [];
+        grouped[h.date].push(h);
     });
+
+    const sortedDates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
+
+    let html = "";
+    let lastMonthKey = null;
+
+    sortedDates.forEach(date => {
+
+        const entries = grouped[date];
+        const d = new Date(date + "T00:00:00");
+        const monthKey = `${d.getFullYear()}-${d.getMonth()}`;
+        const monthLabel = d.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+
+        // Month separator between months
+        if (monthKey !== lastMonthKey) {
+            if (lastMonthKey !== null) html += `</div>`; // close prev month block
+            html += `
+                <div class="history-month-block">
+                <div class="history-month-separator">
+                    <span class="history-month-label">${monthLabel}</span>
+                </div>
+            `;
+            lastMonthKey = monthKey;
+        }
+
+        const takenCount = entries.filter(e => e.status === "Taken").length;
+        const total = entries.length;
+        const dateLabel = d.toLocaleDateString(undefined, {
+            weekday: "long", day: "numeric", month: "short"
+        });
+        const dayId = `hday-${date.replace(/-/g, "")}`;
+
+        // Build the time-grouped body
+        const byTime = {};
+        entries.forEach(e => {
+            if (!byTime[e.time]) byTime[e.time] = [];
+            byTime[e.time].push(e);
+        });
+        const sortedTimes = Object.keys(byTime).sort();
+
+        let bodyHtml = "";
+        sortedTimes.forEach(time => {
+            bodyHtml += `<div class="history-slot"><span class="history-time">⏰ ${time}</span>`;
+            byTime[time].forEach(m => {
+                const isTaken = m.status === "Taken";
+                bodyHtml += `
+                    <div class="history-entry ${isTaken ? "entry-taken" : "entry-missed"}">
+                        <span class="entry-icon">${isTaken ? "✅" : "❌"}</span>
+                        <span class="entry-name">${m.medicine}</span>
+                        <span class="entry-dose">${m.dose}</span>
+                        <span class="entry-status ${isTaken ? "status-done" : "status-missed"}">${m.status}</span>
+                    </div>
+                `;
+            });
+            bodyHtml += `</div>`;
+        });
+
+        html += `
+            <div class="history-day">
+                <div class="history-day-header" onclick="toggleHistoryDay('${dayId}')">
+                    <span class="history-day-label">${dateLabel}</span>
+                    <div class="history-day-right">
+                        <span class="history-day-badge ${takenCount === total ? "badge-all" : "badge-partial"}">
+                            ${takenCount}/${total} taken
+                        </span>
+                        <span class="history-chevron" id="chevron-${dayId}">▼</span>
+                    </div>
+                </div>
+                <div class="history-day-body" id="${dayId}">
+                    ${bodyHtml}
+                </div>
+            </div>
+        `;
+    });
+
+    if (lastMonthKey !== null) html += `</div>`; // close last month block
+
+    container.innerHTML = html;
+}
+
+function toggleHistoryDay(id) {
+
+    const body    = document.getElementById(id);
+    const chevron = document.getElementById(`chevron-${id}`);
+    if (!body) return;
+
+    const isOpen = body.classList.contains("open");
+
+    // Close every open day first (accordion behaviour)
+    document.querySelectorAll(".history-day-body.open").forEach(el => {
+        el.classList.remove("open");
+    });
+    document.querySelectorAll(".history-chevron").forEach(el => {
+        el.textContent = "▼";
+    });
+
+    // If it was closed, open it now; if it was already open, leave it closed
+    if (!isOpen) {
+        body.classList.add("open");
+        if (chevron) chevron.textContent = "▲";
+    }
+}
+
+// =========================
+// SEED HISTORY RANGE (Jun 19 → yesterday)
+// =========================
+
+function seedHistoryRange() {
+
+    // Use today's history entries as the template
+    const todayEntries = db.history.filter(h => h.date === todayKey());
+
+    if (todayEntries.length === 0) return; // nothing to copy yet
+
+    // Build list of all dates from 2026-06-19 up to (not including) today
+    const start = new Date("2026-06-19T00:00:00");
+    const end   = new Date(todayKey() + "T00:00:00");
+
+    const datesToSeed = [];
+    for (let d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
+        datesToSeed.push(d.toISOString().split("T")[0]);
+    }
+
+    // For each missing date, inject copies of today's entries marked Taken
+    let added = false;
+    const existingDates = new Set(db.history.map(h => h.date));
+
+    datesToSeed.forEach(date => {
+        if (existingDates.has(date)) return; // already seeded
+        todayEntries.forEach(h => {
+            db.history.push({
+                date,
+                time:     h.time,
+                medicine: h.medicine,
+                dose:     h.dose,
+                status:   "Taken"
+            });
+        });
+        added = true;
+    });
+
+    if (added) saveDatabase();
+}
+
+// =========================
+// PATCH GABA-LIQUID DOSES
+// =========================
+
+function patchGabaLiquidDoses() {
+
+    let changed = false;
+
+    db.history.forEach(h => {
+
+        if (h.medicine !== "Gaba-Liquid") return;
+
+        const expectedDose = h.date < "2026-06-24" ? "1.3 ml" : "1.6 ml";
+
+        if (h.dose !== expectedDose) {
+            h.dose = expectedDose;
+            changed = true;
+        }
+    });
+
+    if (changed) saveDatabase();
 }
 
 // =========================
@@ -650,6 +818,8 @@ function cleanupOldLogs() {
 function init() {
 
     cleanupOldLogs();
+    seedHistoryRange();
+    patchGabaLiquidDoses();
 
     renderMedicines();
     renderMedicineSelector();
