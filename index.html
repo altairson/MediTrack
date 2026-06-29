@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MediTrack</title>
+    <title>Medina</title>
     <!-- FontAwesome for medical icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Font for professional typography -->
@@ -18,7 +18,7 @@
 <body>
 
     <header>
-        <h1><i class="fa-solid fa-heart-pulse"></i> MediTrack</h1>
+        <h1><i class="fa-solid fa-heart-pulse"></i> Medina</h1>
     </header>
 
     <!-- Navigation -->
@@ -186,6 +186,23 @@
                 </div>
 
                 <div id="emergencySituationList"></div>
+            </div>
+        </div>
+
+        <!-- Backup & Restore Section -->
+        <div class="card" style="margin-top: 16px;">
+            <h2><i class="fa-solid fa-database"></i> Backup & Restore</h2>
+            <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 12px;">
+                Export all your settings, medications, history logs, and schedules to transfer them to another device.
+            </p>
+            <div style="display: flex; gap: 8px;">
+                <button onclick="exportJSONBackup()" style="flex: 1; background: #0891b2;">
+                    <i class="fa-solid fa-download"></i> Export Backup
+                </button>
+                <button onclick="triggerImportBackup()" style="flex: 1; background: #64748b;">
+                    <i class="fa-solid fa-upload"></i> Import Backup
+                </button>
+                <input type="file" id="importBackupInput" style="display: none;" onchange="importJSONBackup(event)" accept=".json">
             </div>
         </div>
 

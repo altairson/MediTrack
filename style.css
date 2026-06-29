@@ -803,12 +803,165 @@ button:active {
 /* Responsive */
 @media (max-width: 480px) {
     body {
-        font-size: 14px;
+        font-size: 13px;
+        padding-bottom: 80px;
+    }
+
+    header {
+        padding: 12px 16px;
+    }
+
+    header h1 {
+        font-size: 1.15rem;
+    }
+
+    .tab {
+        padding: 12px 8px;
+    }
+
+    .card {
+        padding: 12px;
+        margin-bottom: 10px;
+        border-radius: 12px;
+    }
+
+    .card h2 {
+        font-size: 1.0rem;
+        margin-bottom: 12px;
+    }
+
+    input, select, button, textarea {
+        font-size: 0.85rem;
+    }
+
+    input, select, textarea {
+        padding: 8px 10px;
+        margin-bottom: 8px;
+    }
+
+    button {
+        padding: 8px 14px;
+        border-radius: 8px;
+    }
+
+    .bottom-nav {
+        bottom: 10px;
+        width: calc(100% - 16px);
+    }
+    
+    .tab-btn {
+        height: 44px;
+        font-size: 0.7rem;
+        border-radius: 12px;
+    }
+
+    .tab-btn i {
+        font-size: 1.0rem;
+    }
+
+    .history-tabs, .setup-tabs {
+        margin-bottom: 12px;
+        padding: 2px;
+    }
+
+    .history-tab-btn, .setup-tab-btn {
+        padding: 6px 8px;
+        font-size: 0.8rem;
+    }
+
+    .toggle-form-btn {
+        padding: 4px 8px;
+        font-size: 0.75rem;
+    }
+
+    .list-item {
+        padding: 10px;
+        margin-top: 8px;
+        border-radius: 10px;
+    }
+
+    .item-actions button {
+        padding: 6px 10px;
+    }
+
+    .med-item {
+        padding: 8px 0;
+    }
+
+    .med-name {
+        font-size: 0.85rem;
+    }
+
+    .med-dose {
+        font-size: 0.75rem;
+    }
+
+    .med-check {
+        width: 18px;
+        height: 18px;
     }
 
     .history-entry {
-        font-size: .85rem;
-        padding: 8px 12px;
+        font-size: 0.8rem;
+        padding: 6px 10px;
+    }
+
+    .history-day-header {
+        padding: 10px 12px;
+    }
+
+    .history-day-label {
+        font-size: 0.85rem;
+    }
+
+    .history-day-badge {
+        font-size: 0.7rem;
+        padding: 2px 6px;
+    }
+
+    .history-time {
+        font-size: 0.75rem;
+    }
+
+    #emergencyBtn {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+        margin-bottom: 14px;
+        border-radius: 10px;
+    }
+
+    #emergencyBtn i {
+        font-size: 1.1rem;
+    }
+
+    .ambulance-call-btn {
+        padding: 10px 16px;
+        border-radius: 10px;
+    }
+
+    .ambulance-call-btn i {
+        font-size: 1.2rem;
+    }
+
+    .analytics-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+    }
+
+    .analytics-stat-box {
+        padding: 6px 8px;
+    }
+
+    .analytics-stat-label {
+        font-size: 0.7rem;
+    }
+
+    .analytics-stat-value {
+        font-size: 0.8rem;
+    }
+
+    .analytics-card h3 {
+        font-size: 0.95rem;
     }
 }
 

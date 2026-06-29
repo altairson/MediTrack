@@ -614,6 +614,7 @@ function renderMedicineSelector() {
     medicineCheckboxes.innerHTML = "";
 
     db.medicines.forEach(med => {
+        if (med.isEmergency) return;
 
         const div = document.createElement("div");
         div.className = "medicine-option";
@@ -995,7 +996,9 @@ function renderHistory() {
 
     if (!container) return;
 
-    if (db.history.length === 0) {
+    const activeHistory = db.history.filter(h => h.status !== "Missed" && h.status !== "Emergency (Not Given)");
+
+    if (activeHistory.length === 0) {
         container.innerHTML = `
             <div class="history-empty">
                 <div class="history-empty-icon"><i class="fa-solid fa-notes-medical" style="color: #cbd5e1;"></i></div>
@@ -1008,7 +1011,7 @@ function renderHistory() {
 
     // Collect and sort unique dates descending
     const grouped = {};
-    db.history.forEach(h => {
+    activeHistory.forEach(h => {
         if (!grouped[h.date]) grouped[h.date] = [];
         grouped[h.date].push(h);
     });
@@ -1323,13 +1326,9 @@ function renderAnalytics() {
                             ${averageIntake} ${med.unit || ""}${avgSubstanceMgStr}
                         </div>
                     </div>
-                    <div class="analytics-stat-box">
+                    <div class="analytics-stat-box" style="grid-column: span 2;">
                         <div class="analytics-stat-label"><i class="fa-solid fa-circle-check" style="color: var(--success);"></i> Taken Logs</div>
-                        <div class="analytics-stat-value">${takenLogs} / ${totalLogs} times</div>
-                    </div>
-                    <div class="analytics-stat-box">
-                        <div class="analytics-stat-label"><i class="fa-solid fa-circle-xmark" style="color: var(--danger);"></i> Missed Logs</div>
-                        <div class="analytics-stat-value">${missedLogs} times</div>
+                        <div class="analytics-stat-value">${takenLogs} times</div>
                     </div>
                 </div>
 
@@ -1991,10 +1990,11 @@ function exportHistoryLog() {
     });
 
     sorted.forEach(h => {
+        if (h.status === "Missed" || h.status === "Emergency (Not Given)") return;
         rows.push([h.date, h.time, h.medicine, h.dose, h.status]);
     });
 
-    downloadCSV("meditrack_history_log.csv", rows);
+    downloadCSV("medina_history_log.csv", rows);
 }
 
 // =========================
@@ -2005,7 +2005,7 @@ function exportAnalytics() {
     const rows = [
         [
             "Medicine", "Active Ingredient", "Concentration (mg/ml)", "Target mg",
-            "Adherence %", "Total Taken Logs", "Total Missed Logs", "Total Logs",
+            "Adherence %", "Total Taken Logs",
             "Total Volume Taken", "Total Active Substance (mg)",
             "Avg Daily Intake (volume)", "Avg Daily Intake (mg)",
             "Daily Scheduled Doses", "Daily Scheduled Volume", "Daily Scheduled (mg)",
@@ -2019,7 +2019,6 @@ function exportAnalytics() {
     db.medicines.forEach(med => {
         const medLogs = db.history.filter(h => h.medicine === med.name);
         const taken = medLogs.filter(h => h.status === "Taken");
-        const missed = medLogs.filter(h => h.status === "Missed");
 
         let totalVolume = 0;
         taken.forEach(h => { totalVolume += parseAmountAndUnit(h.dose).amount; });
@@ -2047,8 +2046,6 @@ function exportAnalytics() {
             med.targetMg || "",
             adherence,
             taken.length,
-            missed.length,
-            medLogs.length,
             `${formatFloat(totalVolume)} ${med.unit || ""}`,
             med.concentration ? formatFloat(totalVolume * med.concentration) : "",
             `${avgDaily} ${med.unit || ""}`,
@@ -2063,7 +2060,7 @@ function exportAnalytics() {
         ]);
     });
 
-    downloadCSV("meditrack_analytics.csv", rows);
+    downloadCSV("medina_analytics.csv", rows);
 }
 
 // =========================
@@ -2096,7 +2093,7 @@ function exportMedicines() {
         ]);
     });
 
-    downloadCSV("meditrack_medicines.csv", rows);
+    downloadCSV("medina_medicines.csv", rows);
 }
 
 // =========================
@@ -2122,6 +2119,67 @@ function exportSchedules() {
         });
     });
 
-    downloadCSV("meditrack_schedules.csv", rows);
+    downloadCSV("medina_schedules.csv", rows);
 }
+
+// =========================
+// DATA BACKUP & RESTORE
+// =========================
+
+function exportJSONBackup() {
+    const dataStr = JSON.stringify(db, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'medina_backup.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+function triggerImportBackup() {
+    const input = document.getElementById('importBackupInput');
+    if (input) input.click();
+}
+
+function importJSONBackup(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importedDb = JSON.parse(e.target.result);
+            
+            // Validate that we have a valid object
+            if (importedDb && typeof importedDb === 'object') {
+                // Backfill any missing fields to avoid breaking the app
+                if (!importedDb.medicines) importedDb.medicines = [];
+                if (!importedDb.schedules) importedDb.schedules = [];
+                if (!importedDb.dailyLog) importedDb.dailyLog = {};
+                if (!importedDb.history) importedDb.history = [];
+                if (!importedDb.emergencySituations) importedDb.emergencySituations = [];
+
+                db = importedDb;
+                saveDatabase();
+                alert("Backup imported successfully! The application will now reload.");
+                location.reload();
+            } else {
+                alert("Invalid backup file. Could not parse database.");
+            }
+        } catch (err) {
+            alert("Error parsing backup file: " + err.message);
+        }
+    };
+    reader.readAsText(file);
+    // Reset file input value to allow importing the same file again if needed
+    event.target.value = "";
+}
+
+window.exportJSONBackup = exportJSONBackup;
+window.triggerImportBackup = triggerImportBackup;
+window.importJSONBackup = importJSONBackup;
+
 init();
